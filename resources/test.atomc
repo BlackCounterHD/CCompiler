@@ -1,0 +1,50 @@
+// Test program for the AtomC lexical analyzer
+
+/* This block comment
+   spans multiple lines */
+
+int main() {
+    int x = 25;
+    int octal = 017;
+    int hex = 0xAFd9;
+    int zero = 0;
+    double pi = 3.14;
+    double small = 0.5;
+    double sci = 1.5e10;
+    double neg_exp = 3.0e-4;
+    double int_exp = 5e2;
+    char c = 'A';
+    char newline = '\n';
+    char *msg = "hello world\n";
+    
+
+    if (x >= 10 && pi != 0.0) {
+        x = x + 1;
+    } else {
+        x = x - 1;
+    }
+
+    while (x > 0) {
+        x = x / 2;
+    }
+
+    for (x = 0; x < 100; x = x + 1) {
+        pi = pi * 2.0;
+    }
+
+    if (x == 0 || x != 5) {
+        break;
+    }
+
+    struct Point {
+        int a;
+        double b;
+    };
+
+    int arr[10];
+    arr[0] = !x;
+
+    void nothing;
+
+    return 0;
+}
