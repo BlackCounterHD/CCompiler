@@ -175,9 +175,9 @@ int getNextToken(){
             break;
         case 3:
             tk=addTk(CT_INT);
-            char *nr=createString(pStartCh,pCrtCh);
-            tk->i=strtol(nr,NULL,0);
-            free(nr);
+            char *nr_int=createString(pStartCh,pCrtCh);
+            tk->i=strtol(nr_int,NULL,0);
+            free(nr_int);
             return tk->code;
         case 4:
             if(ch>='0' && ch<='7'){pCrtCh++;}
@@ -203,7 +203,7 @@ int getNextToken(){
         case 12:
             if(ch>='0' && ch<='9'){pCrtCh++; state=14;}
             else if(ch=='+' || ch=='-'){pCrtCh++; state=13;}
-            else{tkerr(addTk(END),"invalid real exponent ! ");}
+            else{tkerr(addTk(END),"invalid real exponent");}
             break;
         case 13:
             if(ch>='0' && ch<='9'){pCrtCh++; state=14;}
@@ -215,9 +215,9 @@ int getNextToken(){
             break;
         case 15:
             tk=addTk(CT_REAL);
-            char *nr=createString(pStartCh,pCrtCh);
-            tk->r=strtol(nr,NULL,0);
-            free(nr);
+            char *nr_real=createString(pStartCh,pCrtCh);
+            tk->r=strtol(nr_real,NULL,0);
+            free(nr_real);
             return tk->code;
         default:
             break;
