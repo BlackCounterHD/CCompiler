@@ -114,7 +114,6 @@ int getNextToken(){
             else if(ch<='9' && ch>='1'){pStartCh=pCrtCh; pCrtCh++; state=2;}
             else if(ch=='\''){pStartCh=pCrtCh; pCrtCh++; state=19;}
             else if(ch=='"'){pStartCh=pCrtCh; pCrtCh++; state=22;}
-            else if(ch=='.'){pStartCh=pCrtCh; pCrtCh++; state=43;} //.43 and .09867 exist so state 43 can t be final anymore
             else if(ch=='/'){pCrtCh++; state=42;}//we don t need pStartCh here because we don t need to track linecoments info
             else if(ch=='&'){pCrtCh++; state=44;}
             else if(ch=='|'){pCrtCh++; state=46;}
@@ -136,6 +135,7 @@ int getNextToken(){
             else if (ch == '+') { pCrtCh++; addTk(ADD); return ADD;}
             else if (ch == '-') { pCrtCh++; addTk(SUB); return SUB;}
             else if (ch == '*') { pCrtCh++; addTk(MUL); return MUL;}
+            else if (ch == '.') { pCrtCh++; addTk(DOT); return DOT;}
             else {tkerr(addTk(END),"invalid character ! ");}
             break;
         case 24:
@@ -220,6 +220,9 @@ int getNextToken(){
             free(nr_real);
             return tk->code;
         case 19:
+            if(ch=='//'){pCrtCh++; state=100;}//special state that isn t in the diagram for \n \a \r \... 
+            //else if(ch=='\'' || ch==)
+            break;
         default:
             break;
         }
