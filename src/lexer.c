@@ -219,6 +219,7 @@ int getNextToken(){
             tk->r=strtol(nr_real,NULL,0);
             free(nr_real);
             return tk->code;
+        case 19:
         default:
             break;
         }
