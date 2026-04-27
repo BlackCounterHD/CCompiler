@@ -104,6 +104,17 @@ int getNextToken(){
     char ch;
     int state=0,nCh;
 
+    char buffer[4096];
+    int buffI=0;
+
+    /*
+        When i have char *c = "a\n12" I want \n to bee stored in buffer
+        with the ASCII code of ENTER that means it ll ocupy only one byte.
+        If i tried storing it with create string it will hold 2 bytes
+        one for \ and one for n and also i ll need to store it like
+        tk->text = createString(pStartCh+1,pCrtCh-1) to skip ""
+    */
+
     while(1){
         ch=*(pCrtCh);
         switch(state)
@@ -113,7 +124,7 @@ int getNextToken(){
             else if(ch=='0'){pStartCh=pCrtCh; pCrtCh++; state=1;}
             else if(ch<='9' && ch>='1'){pStartCh=pCrtCh; pCrtCh++; state=2;}
             else if(ch=='\''){pStartCh=pCrtCh; pCrtCh++; state=19;}
-            else if(ch=='"'){pStartCh=pCrtCh; pCrtCh++; state=22;}
+            else if(ch=='"'){pStartCh=pCrtCh; pCrtCh++; state=22; buffI=0;}
             else if(ch=='/'){pCrtCh++; state=42;}//we don t need pStartCh here because we don t need to track linecoments info
             else if(ch=='&'){pCrtCh++; state=44;}
             else if(ch=='|'){pCrtCh++; state=46;}
@@ -220,9 +231,37 @@ int getNextToken(){
             free(nr_real);
             return tk->code;
         case 19:
-            if(ch=='//'){pCrtCh++; state=100;}//special state that isn t in the diagram for \n \a \r \... 
-            //else if(ch=='\'' || ch==)
+            if(ch=='\\'){pCrtCh++; state=100;}//special state that isn t in the diagram for \n \a \r \...  EXPLICITLY : char c = '\n';
+            else if(ch=='\'' || ch=='\n' || ch==0){tkerr(addTk(END),"Invalid char");}
+                    /*
+                        char c = '
+                        a'; this is wrong
+                    */
+            else {tk=addTk(CT_CHAR); tk->i=(unsigned char)ch; pCrtCh++; state=20;}
             break;
+        case 20:
+            if(ch=='\''){pCrtCh++; state=21;}
+            else{tkerr(addTk(END),"missing closing quote for character constant");}
+            break;
+        case 21:
+            return CT_CHAR;
+        case 22:
+            if(ch=='\\'){pCrtCh++; state=101;}//special state that isn t in the diagram for \n \a \r etc..
+            else if(ch=='\n' || ch==0){tkerr(addTk(END),"Invalid char");}
+            else if(ch=='"'){
+                tk=addTk(CT_STRING); 
+                char *str=(char *)malloc(buffI+1);
+                if(!str){fprintf(stderr,"error at allocating memory for str");}
+                strncpy(str,buffer,buffI);
+                str[buffI]='\0';
+                tk->text=str;
+                pCrtCh++;
+                state=23;
+            }
+            else {buffer[buffI]=ch; buffI++; pCrtCh++;}
+            break;
+        case 23:
+            return tk->code;
         default:
             break;
         }
