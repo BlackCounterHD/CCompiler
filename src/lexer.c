@@ -84,7 +84,7 @@ void freeTokenList(Token *head){
 void showTokens(Token *head){
 
     const char *tokenNames[] = {
-        "ID", "BREAK", "CHAR", "DOUBLE", "ELSE", "FOR", "IF", "INT", "RETURN", "STRUCT", "VOID", "WHILE",
+        "ID", "BREAK", "CHAR", "FLOAT", "DOUBLE", "ELSE", "FOR", "IF", "INT", "RETURN", "STRUCT", "VOID", "WHILE",
         "CT_INT", "CT_REAL", "CT_CHAR", "CT_STRING",
         "COMMA", "SEMICOLON", "LPAR", "RPAR", "LBRACKET", "RBRACKET", "LACC", "RACC", "END",
         "ADD", "SUB", "MUL", "DIV", "DOT", "AND", "OR", "NOT", "ASSIGN", "EQUAL", "NOTEQ", "LESS", 
@@ -149,28 +149,6 @@ int getNextToken(){
             else if (ch == '.') { pCrtCh++; addTk(DOT); return DOT;}
             else {tkerr(addTk(END),"invalid character ! ");}
             break;
-        case 24:
-            if(isalnum(ch) || ch=='_'){pCrtCh++;}
-            else{
-                int len=pCrtCh-pStartCh;
-                if(len==5 && memcmp(pStartCh,"break",5)==0) tk=addTk(BREAK);
-                else if (len == 4 && memcmp(pStartCh, "char", 4)==0) tk = addTk(CHAR);
-                else if (len == 6 && memcmp(pStartCh, "double", 6)==0) tk = addTk(DOUBLE);
-                else if (len == 4 && memcmp(pStartCh, "else", 4)==0) tk = addTk(ELSE);
-                else if (len == 3 && memcmp(pStartCh, "for", 3)==0) tk = addTk(FOR);
-                else if (len == 2 && memcmp(pStartCh, "if", 2)==0) tk = addTk(IF);
-                else if (len == 3 && memcmp(pStartCh, "int", 3)==0) tk = addTk(INT);
-                else if (len == 6 && memcmp(pStartCh, "return", 6)==0) tk = addTk(RETURN);
-                else if (len == 6 && memcmp(pStartCh, "struct", 6)==0) tk = addTk(STRUCT);
-                else if (len == 4 && memcmp(pStartCh, "void", 4)==0) tk = addTk(VOID);
-                else if (len == 5 && memcmp(pStartCh, "while", 5)==0) tk = addTk(WHILE);
-                else{
-                    tk = addTk(ID);
-                    tk->text=createString(pStartCh,pCrtCh);
-                }
-                return tk->code;
-            }
-            break;
         case 1:
             if(ch=='.'){pCrtCh++; state=10;}
             else if(ch=='x' || ch=='X'){pCrtCh++; state=5;}
@@ -184,7 +162,7 @@ int getNextToken(){
             else if(ch=='.'){pCrtCh++; state=10;}
             else{state=3;}
             break;
-        case 3:
+        case 3:  //CT_INT 
             tk=addTk(CT_INT);
             char *nr_int=createString(pStartCh,pCrtCh);
             tk->i=strtol(nr_int,NULL,0);
@@ -204,7 +182,7 @@ int getNextToken(){
             break;
         case 10:
             if(ch>='0' && ch<='9'){pCrtCh++; state=11;}
-            else{tkerr(addTk(END),"invalid real exponent ! ");}
+            else{tkerr(addTk(END),"invalid fractional part ! ");}
             break;
         case 11:
             if(ch>='0' && ch<='9'){pCrtCh++;}
@@ -224,10 +202,10 @@ int getNextToken(){
             if(ch>='0' && ch<='9'){pCrtCh++;}
             else{state=15;}
             break;
-        case 15:
+        case 15: //CT_REAL
             tk=addTk(CT_REAL);
             char *nr_real=createString(pStartCh,pCrtCh);
-            tk->r=strtol(nr_real,NULL,0);
+            tk->r=atof(nr_real);
             free(nr_real);
             return tk->code;
         case 19:
@@ -262,9 +240,145 @@ int getNextToken(){
             break;
         case 23:
             return tk->code;
-        default:
+        case 24:
+            if(isalnum(ch) || ch=='_'){pCrtCh++;}
+            else{
+                int len=pCrtCh-pStartCh;
+                if(len==5 && memcmp(pStartCh,"break",5)==0) tk=addTk(BREAK);
+                else if (len == 4 && memcmp(pStartCh, "char", 4)==0) tk = addTk(CHAR);
+                else if (len == 6 && memcmp(pStartCh, "double", 6)==0) tk = addTk(DOUBLE);
+                else if (len == 4 && memcmp(pStartCh, "else", 4)==0) tk = addTk(ELSE);
+                else if (len == 3 && memcmp(pStartCh, "for", 3)==0) tk = addTk(FOR);
+                else if (len == 2 && memcmp(pStartCh, "if", 2)==0) tk = addTk(IF);
+                else if (len == 3 && memcmp(pStartCh, "int", 3)==0) tk = addTk(INT);
+                else if (len == 6 && memcmp(pStartCh, "return", 6)==0) tk = addTk(RETURN);
+                else if (len == 6 && memcmp(pStartCh, "struct", 6)==0) tk = addTk(STRUCT);
+                else if (len == 4 && memcmp(pStartCh, "void", 4)==0) tk = addTk(VOID);
+                else if (len == 5 && memcmp(pStartCh, "while", 5)==0) tk = addTk(WHILE);
+                else if (len == 5 && memcmp(pStartCh, "float", 5)==0) tk = addTk(FLOAT);
+                else{
+                    tk = addTk(ID);
+                    tk->text=createString(pStartCh,pCrtCh);
+                }
+                return tk->code;
+            }
             break;
-        }
+        case 42:
+            if(ch=='/'){state=61; pCrtCh++;}
+            else state=60;
+            break;
+        case 44:
+            if(ch=='&'){state=45; pCrtCh++;}
+            else{tkerr(addTk(END),"wrong character after &");}
+            break;
+        case 45:
+            addTk(AND); 
+            return AND;
+        case 46:
+            if(ch=='|'){state=47; pCrtCh++;}
+            else{tkerr(addTk(END),"wrong character after |");}
+            break;
+        case 47:
+            addTk(OR);
+            return OR;
+        case 48:
+            if(ch=='='){state=53; pCrtCh++;}
+            else{state=52;}
+            break;
+        case 49:
+            if(ch=='='){state=51; pCrtCh++;}
+            else{state=50;}
+            break;
+        case 50:
+            addTk(ASSIGN);
+            return ASSIGN;
+        case 51:
+            addTk(EQUAL);
+            return EQUAL;
+        case 52:
+            addTk(NOT);
+            return NOT;
+        case 53:
+            addTk(NOTEQ);
+            return NOTEQ;
+        case 54:
+            if(ch=='='){state=56; pCrtCh++;}
+            else{state=55;}
+            break;
+        case 55:
+            addTk(LESS);
+            return LESS;
+        case 56:
+            addTk(LESSEQ);
+            return LESSEQ;
+        case 57:
+            if(ch=='='){state=59; pCrtCh++;}
+            else{state=58;}
+            break;
+        case 58:
+            addTk(GREATER);
+            return GREATER;
+        case 59:
+            addTk(GREATEREQ);
+            return GREATEREQ;
+        case 60:
+            addTk(DIV);
+            return DIV;
+        case 61:
+            if(ch=='\n' || ch=='\0' || ch=='\r'){state=0;} //without pCrtCh++ because at state 0 we check again for the same \n and increment the line and pCrtCh
+            else{pCrtCh++;}
+            break;
+        case 100:{
+            int escaped;
+                switch (ch) {
+                    case 'a': escaped = '\a'; break;
+                    case 'b': escaped = '\b'; break;
+                    case 'f': escaped = '\f'; break;
+                    case 'n': escaped = '\n'; break;
+                    case 'r': escaped = '\r'; break;
+                    case 't': escaped = '\t'; break;
+                    case 'v': escaped = '\v'; break;
+                    case '\'': escaped = '\''; break;
+                    case '?': escaped = '?'; break;
+                    case '"': escaped = '"'; break;
+                    case '\\': escaped = '\\'; break;
+                    case '0': escaped = '\0'; break;
+                    default:
+                        tkerr(addTk(END), "invalid escape sequence: \\%c", ch);
+                        escaped = 0;
+                }
+                tk = addTk(CT_CHAR);
+                tk->i = escaped;
+                pCrtCh++;
+                state = 20; 
+                break;
+            }
+        case 101:{
+            char escaped;
+                switch (ch) {
+                    case 'a': escaped = '\a'; break;
+                    case 'b': escaped = '\b'; break;
+                    case 'f': escaped = '\f'; break;
+                    case 'n': escaped = '\n'; break;
+                    case 'r': escaped = '\r'; break;
+                    case 't': escaped = '\t'; break;
+                    case 'v': escaped = '\v'; break;
+                    case '\'': escaped = '\''; break;
+                    case '?': escaped = '?'; break;
+                    case '"': escaped = '"'; break;
+                    case '\\': escaped = '\\'; break;
+                    case '0': escaped = '\0'; break;
+                    default:
+                        tkerr(addTk(END), "invalid escape sequence: \\%c", ch);
+                        escaped = 0;
+                }
+                buffer[buffI]=escaped;
+                buffI++;
+                pCrtCh++;
+                state=22;
+            break;
+            }
+        } 
     }
 }
 
