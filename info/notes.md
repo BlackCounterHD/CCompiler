@@ -61,7 +61,7 @@ void tkerr(const Token *tk,const char *fmt,...)
     vfprintf(stderr,fmt,va);
     fputc('\n',stderr);
     va_end(va);
-    exit(-1);
+    exit(1);
 }
 
 ```

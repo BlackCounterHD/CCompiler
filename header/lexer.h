@@ -35,6 +35,7 @@ char *createString(const char *pStart, const char *pEnd);
 Token *addTk(int code);
 int getNextToken();
 void showTokens(Token *head);
+void showTokensInFile(Token *head);
 void freeTokenList(Token *head);
 
 #endif

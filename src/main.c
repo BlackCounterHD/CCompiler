@@ -25,7 +25,7 @@ int main(int argc,char **argv){
 
     while(getNextToken()!=END){}
 
-    showTokens(head);
+    showTokensInFile(head);
 
     freeTokenList(head);
 

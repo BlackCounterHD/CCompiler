@@ -41,7 +41,7 @@ void err(const char *fmt,...)
     vfprintf(stderr,fmt,va);
     fputc('\n',stderr);
     va_end(va);
-    exit(-1);
+    exit(1);
 }
 
 void tkerr(const Token *tk,const char *fmt,...)
@@ -52,15 +52,15 @@ void tkerr(const Token *tk,const char *fmt,...)
     vfprintf(stderr,fmt,va);
     fputc('\n',stderr);
     va_end(va);
-    exit(-1);
+    exit(1);
 }
 
 char *createString(const char *pStart, const char *pEnd){
     int length=pEnd-pStart;
     char *str=(char *)malloc(length+1);
     if(!str){
-        fprintf(stderr,"couldn t allocate memory");
-        exit(0);
+        fprintf(stderr,"couldn t allocate memory\n");
+        exit(1);
     }
     strncpy(str,pStart,length);
     str[length]='\0';
@@ -97,6 +97,29 @@ void showTokens(Token *head){
         curr=curr->next;
     }
 
+}
+
+void showTokensInFile(Token *head){
+
+    FILE *f=fopen("../bin/lexer_output.txt","w");
+    if(!f){
+        fprintf(stderr,"error at opening the file");
+        exit(1);
+    }
+    const char *tokenNames[] = {
+        "ID", "BREAK", "CHAR", "FLOAT", "DOUBLE", "ELSE", "FOR", "IF", "INT", "RETURN", "STRUCT", "VOID", "WHILE",
+        "CT_INT", "CT_REAL", "CT_CHAR", "CT_STRING",
+        "COMMA", "SEMICOLON", "LPAR", "RPAR", "LBRACKET", "RBRACKET", "LACC", "RACC", "END",
+        "ADD", "SUB", "MUL", "DIV", "DOT", "AND", "OR", "NOT", "ASSIGN", "EQUAL", "NOTEQ", "LESS", 
+        "LESSEQ", "GREATER", "GREATEREQ"
+    };
+    Token *curr;
+    curr=head;
+    while(curr!=NULL){
+        fprintf(f,"At Line %d found %s\n",curr->line,tokenNames[curr->code]);
+        curr=curr->next;
+    }
+    fclose(f);
 }
 
 int getNextToken(){
@@ -230,7 +253,7 @@ int getNextToken(){
             else if(ch=='"'){
                 tk=addTk(CT_STRING); 
                 char *str=(char *)malloc(buffI+1);
-                if(!str){fprintf(stderr,"error at allocating memory for str");exit(0);}
+                if(!str){fprintf(stderr,"error at allocating memory for str");exit(1);}
                 strncpy(str,buffer,buffI);
                 str[buffI]='\0';
                 tk->text=str;
