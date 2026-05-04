@@ -96,6 +96,7 @@ void showTokens(Token *head){
         fprintf(stdout,"At Line %d found %s\n",curr->line,tokenNames[curr->code]);
         curr=curr->next;
     }
+
 }
 
 int getNextToken(){
@@ -229,7 +230,7 @@ int getNextToken(){
             else if(ch=='"'){
                 tk=addTk(CT_STRING); 
                 char *str=(char *)malloc(buffI+1);
-                if(!str){fprintf(stderr,"error at allocating memory for str");}
+                if(!str){fprintf(stderr,"error at allocating memory for str");exit(0);}
                 strncpy(str,buffer,buffI);
                 str[buffI]='\0';
                 tk->text=str;

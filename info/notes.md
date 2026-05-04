@@ -49,6 +49,23 @@ if(!bigString){
 
 fread(bigString, fsize, 1, f);
 ```
+4. **void tkerr(const Token *tk,const char *fmt,...)** this is a variadic function like printf fprintf etc.  and it accepts as many arguments as you want due to ... like printf (man printf)
+
+```c
+
+void tkerr(const Token *tk,const char *fmt,...)
+{
+    va_list va;
+    va_start(va,fmt);
+    fprintf(stderr,"error in line %d: ",tk->line);
+    vfprintf(stderr,fmt,va);
+    fputc('\n',stderr);
+    va_end(va);
+    exit(-1);
+}
+
+```
+vfprintf is for variadic funtions that s why it starts whith v at it concatenates everything to what we already printed here : fprintf(stderr,"error in line %d: ",tk->line);
 
 ## Errors
 
@@ -59,3 +76,14 @@ I added tkerr in the states where is no coming back if i introduce a bad token f
 1. In C is valid **123.** or **.097** but in AtomC is not valid . If i lll decide to implement i need to change in state 43 and state 10 !
 2. I can also modify it to support **linecomments** /*  *\
 3. Also base 2 numbers plus bitwise operators : & , | , ~ , ^ 
+
+## Global variables
+
+1. Global variables are created before runtime so if i try to assign the global variable crtTk in syntactical.c to head that will point to the head of the token list at **runtime** it will give an erro that s why i assign it in the **parse()** function.
+
+## Syntactical Part
+
+1. When startTk is needed : 
+    1. At structDef: STRUCT ID LACC we can t use tkerr and stop the program if LACC is missing because we can have STRUCT ID ID ( struct Car car ) at varDef: typeBase ID where typeBase can be STRUCT ID
+    2. At varDef: typeBase ID arrayDecl? SEMICOLON we can t use tkerr and stop the program if SEMICOLON is missing because we can have typeBase ID  LPAR at fnDef ( int a() )
+

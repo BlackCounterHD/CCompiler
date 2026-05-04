@@ -1,0 +1,126 @@
+# Dictionar de secvente valide pentru gramatica AtomC
+
+Acest document contine exemple de cod sursa care se potrivesc perfect pe fiecare regula sintactica (non-terminal) din limbajul AtomC.
+
+1. DECLARATII SI STRUCTURI DE BAZA
+
+* typeBase (Tipurile de date de baza permise):
+    - int
+    - double
+    - char
+    - struct Punct
+
+* arrayDecl (Declararea de dimensiune pentru vectori):
+    - [100] (cu dimensiune specificata)
+    - [] (fara dimensiune)
+
+* varDef (Definirea unei variabile, se termina mereu cu punct si virgula):
+    - int a;
+    - double valori[50];
+    - struct Masina m;
+
+* structDef (Definirea unei structuri):
+    - struct Punct { int x; int y; };
+    - struct Node { double valoare; struct Node next; };
+    - struct Gol { }; (fara variabile in interior)
+
+* fnParam (Un parametru dintr-o functie):
+    - int x
+    - double vector[]
+    - struct Punct p
+
+* fnDef (Definirea unei functii intregi cu tot cu corpul ei):
+    - int suma(int a, int b) { return a + b; }
+    - void afiseaza() { } (fara parametri, corp gol)
+    - struct Punct genereaza(double coord[]) { struct Punct p; p.x = coord[0]; return p; }
+
+* unit (Tot programul tau cap-coada, format dintr-o insiruire a celor de mai sus):
+    - struct Punct { int x; int y; };
+      int globalVar;
+      void main() { int local; }
+
+---------------------------------------------------------
+
+2. INSTRUCTIUNI (stm)
+Regula 'stm' accepta urmatoarele randuri de cod:
+
+* Bloc de instructiuni (stmCompound):
+    - { int a; a = 5; }
+    - { }
+
+* Instructiunea IF:
+    - if (x == 5) x = 0; (fara else)
+    - if (x > 0) { x = x - 1; } else { x = x + 1; } (cu else)
+
+* Instructiunea WHILE:
+    - while (a < 10) a = a + 1;
+    - while (1) { break; }
+
+* Instructiunea FOR:
+    - for (i = 0; i < 10; i = i + 1) afiseaza();
+    - for ( ; ; ) { break; } (toate expresiile sunt optionale)
+
+* Break si Return:
+    - break;
+    - return; (fara expresie)
+    - return x + 5; (cu expresie)
+
+* Expresie ca instructiune (Orice expresie terminata cu punct si virgula):
+    - x = 5;
+    - apelFunctie(a, b);
+    - ; (instructiunea vida, formata doar din ';' deoarece expresia e optionala)
+
+---------------------------------------------------------
+
+3. EXPRESII (expr)
+Expresiile sunt construite pe o ierarhie stricta (de la cea mai "slaba" la cea mai "puternica" operatie).
+
+* exprAssign (Atribuiri):
+    - x = 5
+    - vector[0] = p.x = 10 (atribuiri multiple)
+
+* exprOr (SAU logic):
+    - a || b
+    - x == 5 || y < 10
+
+* exprAnd (SI logic):
+    - a && b
+
+* exprEq (Egalitate/Inegalitate):
+    - x == y
+    - x != 0
+
+* exprRel (Relationale):
+    - a < b
+    - a >= 10
+
+* exprAdd (Adunare/Scadere):
+    - x + y
+    - 10 - 5 + 2
+
+* exprMul (Inmultire/Impartire):
+    - a * b
+    - x / 2
+
+* exprCast (Conversie de tip):
+    - (int) 3.14
+    - (struct Punct) variabila
+
+* exprUnary (Operatori unari):
+    - -x (numar negativ)
+    - !gasit (negatie logica)
+
+* exprPostfix (Accesare vectori sau campuri din structura):
+    - vector[5]
+    - p.x
+    - lista[0].valoare
+
+* exprPrimary (Baza oricarei expresii - elementele primare):
+    - x (Identificator simplu)
+    - suma(1, 2) (Apel de functie cu parametri)
+    - afiseaza() (Apel de functie fara parametri)
+    - 42 (Constanta intreaga - CT_INT)
+    - 3.14 (Constanta reala - CT_REAL)
+    - 'A' (Caracter - CT_CHAR)
+    - "salut" (Sir de caractere - CT_STRING)
+    - ( x + 2 ) (O alta expresie intreaga, inchisa intre paranteze rotunde)
