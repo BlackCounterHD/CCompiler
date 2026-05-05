@@ -101,7 +101,7 @@ void showTokens(Token *head){
 
 void showTokensInFile(Token *head){
 
-    FILE *f=fopen("../bin/lexer_output.txt","w");
+    FILE *f=fopen("bin/lexer_output.txt","w");
     if(!f){
         fprintf(stderr,"error at opening the file");
         exit(1);
