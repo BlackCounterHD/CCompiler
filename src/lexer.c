@@ -126,7 +126,7 @@ int getNextToken(){
     Token *tk;
     const char *pStartCh;
     char ch;
-    int state=0,nCh;
+    int state=0;
 
     char buffer[4096];
     int buffI=0;
