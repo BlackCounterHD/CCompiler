@@ -16,6 +16,8 @@ int consume(int code){
 
 int unit(){
 
+    crtTk=head;
+
     while(1)
     {
         if(structDef()){}
@@ -29,6 +31,7 @@ int unit(){
     else{
         tkerr(crtTk,"Syntax error : Invalid code at global level");
     }
+    return 0;
 
 }
 
@@ -66,9 +69,8 @@ int structDef(){
             tkerr(crtTk,"Syntax error : missing declaration");
         }
     }
-    else {
-        return 0;
-    }
+    return 0;
+    
 }
 
 int varDef(){
@@ -90,9 +92,8 @@ int varDef(){
             tkerr(crtTk,"Syntax error : missing declaration");
         }
     }
-    else {
-        return 0;
-    }
+    return 0;
+    
 }
 
 int typeBase(){
@@ -109,7 +110,7 @@ int typeBase(){
 
         }
     }
-    else{return 0;}
+    return 0;
 }
 
 int arrayDecl(){
@@ -123,9 +124,8 @@ int arrayDecl(){
             tkerr(crtTk,"Syntax error : missing ]");
         }
     }
-    else{
-        return 0;
-    }
+    return 0;
+    
 }
 
 int fnDef(){
@@ -166,9 +166,167 @@ int fnDef(){
             tkerr(crtTk,"Syntax error : missing declaration");
         }
     }
-    else{
-        return 0;
-    }
+    return 0;
+    
 }
+
+int fnParam() {
+    if(typeBase()){
+        if(consume(ID)){
+            arrayDecl();
+            return 1;
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing function parameter");
+        }
+    }
+    return 0; 
+}
+
+int stm(){
+
+    if(stmcompound()){
+        return 1;
+    }
+
+    if(consume(IF)){
+        if(consume(LPAR)){
+            if(expr()){
+                if(consume(RPAR)){
+                    if(stm()){
+                        if(consume(ELSE)){
+                            if(stm()){
+                                return 1;
+                            }
+                            else{
+                                tkerr(crtTk,"Syntax error : missing else statement");
+                            }
+                        }
+                        return 1;
+                    }
+                    else{
+                        tkerr(crtTk,"Syntax error : missing if statement");
+                    }
+                }
+                else{
+                    tkerr(crtTk,"Syntax error : missing )");
+                }
+            }
+            else{
+                tkerr(crtTk,"Syntax error : missing if expression");
+            }
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing (");
+        }
+    }
+
+    if(consume(WHILE)){
+        if(consume(LPAR)){
+            if(expr()){
+                if(consume(RPAR)){
+                    if(stm()){
+                        return 1;
+                    }
+                    else{
+                        tkerr(crtTk,"Syntax error : missing while statement");
+                    }
+                }
+                else{
+                    tkerr(crtTk,"Syntax error : missing )");
+                }
+            }
+            else{
+                tkerr(crtTk,"Syntax error : missing while expression");
+            }
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing (");
+        }
+    }
+    
+    if(consume(FOR)){
+        if(consume(LPAR)){
+            expr();   
+            if(consume(SEMICOLON)){
+                expr();
+                if(consume(SEMICOLON)){
+                    expr();
+                    if(consume(RPAR)){
+                        if(stm()){
+                            return 1;
+                        }
+                        else{
+                            tkerr(crtTk,"Syntax error : missing for statement");
+                        }
+                    }
+                    else{
+                        tkerr(crtTk,"Syntax error : missing )");
+                    }
+                }
+                else{
+                    tkerr(crtTk,"Syntax error : missing second ; expression");
+                }
+            }
+            else{
+                tkerr(crtTk,"Syntax error : missing first ; expression");
+            }
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing (");
+        }
+    }
+
+    if(consume(BREAK)){
+        if(consume(SEMICOLON)){
+            return 1;
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing ;");
+        }
+    }
+
+    if(consume(RETURN)){
+        expr();
+        if(consume(SEMICOLON)){
+            return 1;
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing ;");
+        }
+    }
+
+    if (expr()) {
+        if (consume(SEMICOLON)) return 1;
+        else tkerr(crtTk, "Syntax error : missing ; ");
+    }
+    else if (consume(SEMICOLON)) {
+        return 1; 
+    }
+    
+    return 0;
+}
+
+int stmcompound() {
+
+    if(consume(LACC)){
+        while(1){
+            if(varDef() || stm()){}
+            else break;
+        }
+        if(consume(RACC)){
+            return 1;
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing }");
+        }
+    }
+    return 0;
+}
+
+int expr(){
+    return 0;
+}
+
 
 

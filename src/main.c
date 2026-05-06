@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "../header/lexer.h"
 #include "../header/utils.h"
+#include "../header/syntactical.h"
 
 int main(int argc,char **argv){
 
@@ -26,6 +27,8 @@ int main(int argc,char **argv){
     while(getNextToken()!=END){}
 
     showTokensInFile(head);
+
+    unit();
 
     freeTokenList(head);
 
