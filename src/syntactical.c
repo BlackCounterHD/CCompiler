@@ -325,8 +325,214 @@ int stmcompound() {
 }
 
 int expr(){
+    if(exprAssign()){
+        return 1;
+    }
     return 0;
 }
 
+int exprAssign(){
 
+    Token *startTk=crtTk;
+    if(exprUnary()){
+        if(consume(ASSIGN)){
+            if(exprAssign()){
+                return 1;
+            }
+            else{
+                tkerr(crtTk,"Syntax error : missing expression");
+            }
+        }
+        else{
+            crtTk=startTk;
+            return 0;
+        }
+    }
+    return 0;
+}
+
+/*exprOr: exprOr OR exprAnd | exprAnd
+exprOr=exprAnd exprOrAux
+exprOrAux=OR exprAnd exprOrAux | epsilon
+*/
+int exprOr(){
+    if(exprAnd()){
+        if(exprOrAux()){
+            return 1;
+        }
+        //we don t need else case because exprOrAux will always return 1 or will be a tkerr;
+    }
+    return 0;
+}
+
+int exprOrAux(){
+    if(consume(OR)){
+        if(exprAnd()){
+            if(exprOrAux()){
+                return 1;
+            } //if we look at the example a || b and follow through the funtions at the end exprOrAux will return 1 and the syntactic is good
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing expression");
+        }
+    }
+    return 1; //epsilon represents the empty string and lets the funtions to return true if it s nothing next
+}
+
+int exprAnd(){
+    if(exprEq()){
+        if(exprAndAux()){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int exprAndAux(){
+    if(consume(AND)){
+        if(exprEq()){
+            if(exprAndAux()){
+                return 1;
+            }
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing expression");
+        }
+    }
+    return 1; 
+}
+
+int exprEq(){
+    if(exprRel()){
+        if(exprEqAux()){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int exprEqAux(){
+    if(consume(EQUAL) || consume(NOTEQ)){
+        if(exprRel()){
+            if(exprEqAux()){
+                return 1;
+            }
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing expression");
+        }
+    }
+    return 1;
+}
+
+int exprRel(){
+    if(exprAdd()){
+        if(exprRelAux()){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int exprRelAux(){
+    if(consume(LESS) || consume(LESSEQ) || consume(GREATER) || consume(GREATEREQ)){
+        if(exprAdd()){
+            if(exprRelAux){
+                return 1;
+            }
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing expression");
+        }
+    }
+    return 1;
+}
+
+int exprAdd(){
+    if(exprMul()){
+        if(exprAddAux()){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int exprAddAux(){
+    if(consume(ADD) || consume(SUB)){
+        if(exprMul()){
+            if(exprAddAux()){
+                return 1;
+            }
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing expression");
+        }
+    }
+    return 1;
+}
+
+int exprMul(){
+    if(exprCast()){
+        if(exprMulAux()){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int exprMulAux(){
+    if(consume(MUL) || consume(DIV)){
+        if(exprCast()){
+            if(exprMulAux()){
+                return 1;
+            }
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing expression");
+        }
+    }
+    return 1;
+}
+
+int exprCast(){
+
+    if(consume(LPAR)){
+        if(typeBase()){
+            arrayDecl();
+            if(consume(RPAR)){
+                if(exprCast()){
+                    return 1;
+                }
+                else{
+                    tkerr(crtTk,"Syntax error : missing expression");
+                }
+            }
+            else{
+                tkerr(crtTk,"Syntax error : missing )");
+            }
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing expression");
+        }
+    }
+    if(exprUnary()){
+        return 1;
+    }
+    return 0;
+}
+
+int exprUnary(){
+    if(consume(SUB) || consume(NOT)){
+        if(exprUnary()){
+            return 1;
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing expression");
+        }
+    }
+    if(exprPostfix()){
+        return 1;
+    }
+    return 1;
+}
 

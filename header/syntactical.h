@@ -13,5 +13,22 @@ int fnParam();
 int stm();
 int stmcompound();
 int expr();
+int exprAssign();
+int exprOr();
+int exprOrAux();
+int exprAnd();
+int exprAndAux();
+int exprEq();
+int exprEqAux();
+int exprRel();
+int exprRelAux();
+int exprAdd();
+int exprAddAux();
+int exprMul();
+int exprMulAux();
+int exprCast();
+int exprUnary();
+int exprPostfix();
+int exprPrimary();
 
 #endif

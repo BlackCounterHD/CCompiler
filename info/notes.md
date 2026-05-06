@@ -2,6 +2,11 @@
 
 # Notes
 
+## Left Recursion needs to be Eliminated !
+
+1. exprOr: exprOr OR exprAnd | exprAnd here when exprOr is called it will enter in an infinite recursion because it will call itself and crtTk will never advance that s why we use the formula rpesented in resources/syntacticalRecRule.jpg
+2. exprAssign: exprUnary ASSIGN exprAssign | exprOr here , when il will call exprAssign again crtTk is already advanced ( ex : x=y=5 exprUnary takes x , assign takes first = then it calls exprAssign and again exprUnary takes y then Assign takes second = then it calls exprAssign again and takes the final 5)
+
 ## Extern variables
 
 1. I can declare them in a **header file** but i need to include that header file whenever i wanna use them
