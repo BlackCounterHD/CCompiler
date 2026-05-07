@@ -1,8 +1,7 @@
 // Test program for the AtomC lexical analyzer
 
-/* This block comment
-   spans multiple lines */
-
+/* dawd
+dadwwadaw */
 int main() {
     int x = 25;
     int octal = 017;

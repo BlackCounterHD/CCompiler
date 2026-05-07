@@ -345,8 +345,11 @@ int exprAssign(){
         }
         else{
             crtTk=startTk;
-            return 0;
+            //return 0; can t return 0 because we need to try exprOr also in this function
         }
+    }
+    if(exprOr()){
+        return 1;
     }
     return 0;
 }
@@ -437,7 +440,7 @@ int exprRel(){
 int exprRelAux(){
     if(consume(LESS) || consume(LESSEQ) || consume(GREATER) || consume(GREATEREQ)){
         if(exprAdd()){
-            if(exprRelAux){
+            if(exprRelAux()){
                 return 1;
             }
         }
@@ -496,6 +499,7 @@ int exprMulAux(){
 
 int exprCast(){
 
+    Token *startTk=crtTk;
     if(consume(LPAR)){
         if(typeBase()){
             arrayDecl();
@@ -511,9 +515,7 @@ int exprCast(){
                 tkerr(crtTk,"Syntax error : missing )");
             }
         }
-        else{
-            tkerr(crtTk,"Syntax error : missing expression");
-        }
+        crtTk=startTk; //if it s not a cast it s an exprUnary and we need to try it 
     }
     if(exprUnary()){
         return 1;
@@ -533,6 +535,106 @@ int exprUnary(){
     if(exprPostfix()){
         return 1;
     }
+    return 0;
+}
+
+/*
+    exprPostfix: exprPostfix LBRACKET expr RBRACKET
+    | exprPostfix DOT ID
+    | exprPrimary
+    A=Aalpha1|Aalpha2|beta1
+*/
+int exprPostfix(){
+    if(exprPrimary()){
+        if(exprPostfixAux()){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int exprPostfixAux(){
+    if(consume(LBRACKET)){
+        if(expr()){
+            if(consume(RBRACKET)){
+                if(exprPostfixAux()){
+                    return 1;
+                }
+            }
+            else{
+                tkerr(crtTk,"Syntax error : missing ]");
+            }
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing expr");
+        }
+    }
+    if(consume(DOT)){
+        if(consume(ID)){
+            if(exprPostfixAux()){
+                return 1;
+            }
+        }
+        else{
+            tkerr(crtTk,"Syntax error : missing id");
+        }
+    }
     return 1;
 }
 
+int exprPrimary(){
+    if(consume(ID)){
+        if(consume(LPAR)){
+            if(expr()){
+                while(1){
+                    if(consume(COMMA)){
+                        if(expr()){
+                            
+                        }
+                        else{
+                            tkerr(crtTk,"Syntax error : missing expr");
+                        }
+                    }
+                    else{
+                        break;
+                    }
+                }
+            }
+            if(consume(RPAR)){
+                    return 1;
+            }
+            else{
+                tkerr(crtTk,"Syntax error : missing )");
+            }
+        }
+        return 1;
+    }
+    if(consume(CT_CHAR)){
+        return 1;
+    }
+    if(consume(CT_INT)){
+        return 1;
+    }
+    if(consume(CT_REAL)){
+        return 1;
+    }
+    if(consume(CT_STRING)){
+        return 1;
+    }
+    if(consume(LPAR)){
+        if(expr()){
+            if(consume(RPAR)){
+                return 1;
+            } 
+            else 
+            {
+                tkerr(crtTk,"Syntax error : missing )");
+            }
+        } 
+        else 
+        {
+            tkerr(crtTk,"Syntax error : missing expr");
+        }
+    }
+    return 0;
+}

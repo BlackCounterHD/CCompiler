@@ -29,6 +29,7 @@ int exprMulAux();
 int exprCast();
 int exprUnary();
 int exprPostfix();
+int exprPostfixAux();
 int exprPrimary();
 
 #endif
