@@ -92,3 +92,10 @@ I added tkerr in the states where is no coming back if i introduce a bad token f
     1. At structDef: STRUCT ID LACC we can t use tkerr and stop the program if LACC is missing because we can have STRUCT ID ID ( struct Car car ) at varDef: typeBase ID where typeBase can be STRUCT ID
     2. At varDef: typeBase ID arrayDecl? SEMICOLON we can t use tkerr and stop the program if SEMICOLON is missing because we can have typeBase ID  LPAR at fnDef ( int a() )
 
+## Semantical Part
+
+1. The implementation for the domain analysis related to semantical uses an Array that will auto - increment itself when there is no room left for adding new Symbols ( symbols->end==symbols->after )
+
+2. A second type of implementation could use linked list insead of a vector but , although it s easier to implement the add , delete and find functions the problem relies in **memory allocation** . When using an **array** the memory is a contignous block and all the pointers to the sysmbols are being put to addresses one near eachother and it s easier for the processor to read them using the cache memory . When using a linked list the memory is spread trough the RAM and the addreses are random resulting in a harder iteration for the processor .
+
+3. A third type of implementation that i could **try** is  using a hash table that most compilers use.

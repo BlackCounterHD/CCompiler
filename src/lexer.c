@@ -6,9 +6,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "../header/lexer.h"
-
-#define SAFEALLOC(var,Type) if((var=(Type*)malloc(sizeof(Type)))==NULL)err("not enough memory");
-
+#include "../header/utils.h"
 
 Token *tail=NULL;
 Token *head=NULL;
