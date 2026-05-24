@@ -26,11 +26,11 @@ int main(int argc,char **argv){
 
     while(getNextToken()!=END){}
 
-    showTokensInFile(head);
+    showTokensInFile();
 
     unit();
 
-    freeTokenList(head);
+    freeTokenList();
 
     return 0;
     

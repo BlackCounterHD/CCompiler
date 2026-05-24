@@ -3,7 +3,6 @@
 #include "../header/semantic_domain_w_vector.h"
 #include "../header/utils.h"
 
-Symbols symbols;
 int crtDepth=0;
 
 void initSymbols(Symbols *symbols){
@@ -61,7 +60,7 @@ void dropDomain(Symbols *symbols){
 
     count--;
 
-    while(count>0 && symbols->begin[count]->depth>crtDepth){
+    while(count>=0 && symbols->begin[count]->depth>crtDepth){
         free(symbols->begin[count]);
         symbols->end--;
         count--;

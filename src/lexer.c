@@ -65,7 +65,7 @@ char *createString(const char *pStart, const char *pEnd){
     return str;
 }
 
-void freeTokenList(Token *head){
+void freeTokenList(){
     Token *curr1,*curr2;
     curr1=curr2=head;
     while(curr2!=NULL){
@@ -79,7 +79,7 @@ void freeTokenList(Token *head){
 }
 
 
-void showTokens(Token *head){
+void showTokens(){
 
     const char *tokenNames[] = {
         "ID", "BREAK", "CHAR", "FLOAT", "DOUBLE", "ELSE", "FOR", "IF", "INT", "RETURN", "STRUCT", "VOID", "WHILE",
@@ -97,7 +97,7 @@ void showTokens(Token *head){
 
 }
 
-void showTokensInFile(Token *head){
+void showTokensInFile(){
 
     FILE *f=fopen("bin/lexer_output.txt","w");
     if(!f){

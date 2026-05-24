@@ -84,7 +84,7 @@ I added tkerr in the states where is no coming back if i introduce a bad token f
 
 ## Global variables
 
-1. Global variables are created before runtime so if i try to assign the global variable crtTk in syntactical.c to head that will point to the head of the token list at **runtime** it will give an erro that s why i assign it in the **parse()** function.
+1. Global variables are created before runtime so if i try to assign the global variable crtTk in syntactical.c to head that will point to the head of the token list at **runtime** it will give an erro that s why i assign it in the **unit()** function.
 
 ## Syntactical Part
 
@@ -99,3 +99,14 @@ I added tkerr in the states where is no coming back if i introduce a bad token f
 2. A second type of implementation could use linked list insead of a vector but , although it s easier to implement the add , delete and find functions the problem relies in **memory allocation** . When using an **array** the memory is a contignous block and all the pointers to the sysmbols are being put to addresses one near eachother and it s easier for the processor to read them using the cache memory . When using a linked list the memory is spread trough the RAM and the addreses are random resulting in a harder iteration for the processor .
 
 3. A third type of implementation that i could **try** is  using a hash table that most compilers use.
+
+## Pointers
+
+1. From :
+    ```c
+        void showTokens();
+        void showTokensInFile();
+        void freeTokenList();
+    ```
+i took out the argument Token *head from those functions because it s not needed . We work with the global variable head 
+

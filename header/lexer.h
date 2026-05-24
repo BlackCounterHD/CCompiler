@@ -34,8 +34,8 @@ void tkerr(const Token *tk, const char *fmt, ...);
 char *createString(const char *pStart, const char *pEnd);
 Token *addTk(int code);
 int getNextToken();
-void showTokens(Token *head);
-void showTokensInFile(Token *head);
-void freeTokenList(Token *head);
+void showTokens();
+void showTokensInFile();
+void freeTokenList();
 
 #endif

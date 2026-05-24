@@ -1,6 +1,13 @@
 #ifndef SEMANTICD_H
 #define SEMANTICD_H
 
+//FORWARD DECLARATIONS
+struct _Symbol;
+typedef struct _Symbol Symbol;
+
+struct _Symbols;
+typedef struct _Symbols Symbols;
+
 enum{TB_INT,TB_DOUBLE,TB_CHAR,TB_STRUCT,TB_VOID};
 
 typedef struct{
@@ -34,12 +41,11 @@ typedef struct{
     Symbol **after; // the position after the allocated space
 }Symbols;
 
-extern Symbols symbols;
 extern int crtDepth;
 
 void initSymbols(Symbols *symbols);
 void pushDomain();
-void dropDomain();
+void dropDomain(Symbols *symbols);
 Symbol *addSymbol(Symbols *symbols,const char *name,int cls);
 Symbol *findSymbol(Symbols *symbols,const char *name);
 
