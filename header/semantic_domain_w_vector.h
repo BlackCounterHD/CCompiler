@@ -8,7 +8,7 @@ typedef struct _Symbol Symbol;
 struct _Symbols;
 typedef struct _Symbols Symbols;
 
-enum{TB_INT,TB_DOUBLE,TB_CHAR,TB_STRUCT,TB_VOID};
+enum{TB_INT,TB_DOUBLE,TB_CHAR,TB_STRUCT,TB_VOID,TB_FLOAT};
 
 typedef struct{
 
@@ -33,6 +33,14 @@ typedef struct _Symbol{
         Symbols members; // used only for structs
     };
 
+    union 
+    {
+        int varIdx;
+        int paramIdx; 
+    };
+    
+    struct _Symbol *owner;
+
 }Symbol;
 
 typedef struct{
@@ -42,12 +50,20 @@ typedef struct{
 }Symbols;
 
 extern int crtDepth;
+extern Symbols symbols;
+extern Symbol *owner;
 
 void initSymbols(Symbols *symbols);
 void pushDomain();
 void dropDomain(Symbols *symbols);
-Symbol *addSymbol(Symbols *symbols,const char *name,int cls);
+Symbol* newSymbol(const char *name,int cls);
+Symbol *addSymbolToDomain(Symbols *symbols,const char *name,int cls);
 Symbol *findSymbol(Symbols *symbols,const char *name);
+Symbol *findSymbolInDomain(Symbols *symbols,const char *name);
+int symbolsLen(Symbols args);
+void addSymbolToList(Symbols *argsOrmembers);
+Symbol *dupSymbol(Symbol s);
+int typeSize(Type type);
+void allocInGlobalMemory(int size)
 
-
-#endif SEMANTICD_H
+#endif 

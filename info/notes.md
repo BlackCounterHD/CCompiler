@@ -100,6 +100,22 @@ I added tkerr in the states where is no coming back if i introduce a bad token f
 
 3. A third type of implementation that i could **try** is  using a hash table that most compilers use.
 
+4. **s** parameter in type and **owner**
+    ```c
+        struct Patrat {
+            int x; // owner = Patrat
+        };
+
+        struct Triunghi {
+            int x; // owner = Triunghi
+        };
+
+        struct Patrat p1;   // type.s = Patrat
+        struct Triunghi t1; // type.s = Triunghi
+    ```
+5. **inout and out** . If is **out** it means it s modified in that function , if **inout** it means it comes with something and also is modified in that function
+
+6. **varIdx and paramIdx** represent the memory location of the variable or func parameter in the memory to be later used at code generation (for a virtual machine or assembly code) . our compiler will only need the memory locations not the names.
 ## Pointers
 
 1. From :
@@ -110,3 +126,18 @@ I added tkerr in the states where is no coming back if i introduce a bad token f
     ```
 i took out the argument Token *head from those functions because it s not needed . We work with the global variable head 
 
+2. In functions that we pass symbols as a reference we need to acces the values and we would have done for example (*symbols).begin=... but we can do it more simple like : symbols->begin
+
+3. Why do we need to use ** for the vector of pointers (begin,end,after) ?
+    1. Because we work with a vector of pointers of type Symbol . if we didnt use ** we would have needed to work with a vector of symbols which would have been much bigger in terms of memory  we couldn t use SAFEALLOC because it returns a pointer to an address and we work with a vector of symbols.
+    2. If we have had only  the vector of symsbols and we couldn t use safealloc whenever we used in a function ex.type.s=s (when we reference a struct variable to a struct or smth similar) it would crash at the next realloc because that address is lost (becasue of realocating the big vector of symbols) . Instead, if we use a vector of pointers whenever we create a new Symbol with safealloc and add it to the vector that address won t be lost until we free it.
+    3. 
+     ```c
+        int x=5;
+        int *y=x; F
+        int *y=&x; T
+
+        symbols->end=s; F
+        symbols->end=&s; T
+        *symbols->end=s; T
+    ```

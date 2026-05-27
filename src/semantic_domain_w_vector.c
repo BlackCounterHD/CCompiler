@@ -11,7 +11,19 @@ void initSymbols(Symbols *symbols){
     symbols->after=NULL;
 }
 
-Symbol *addSymbol(Symbols *symbols,const char *name,int cls){
+Symbol *newSymbol(const char *name,int cls){
+
+    Symbol *s;
+
+    SAFEALLOC(s,Symbol)
+
+    s->name=name;
+    s->cls=cls;
+
+    return s;
+}
+
+Symbol *addSymbolToDomain(Symbols *symbols,const char *name,int cls){
     Symbol *s;
     if(symbols->end==symbols->after){ // create more room
 
@@ -29,11 +41,11 @@ Symbol *addSymbol(Symbols *symbols,const char *name,int cls){
 
     }
 
-    SAFEALLOC(s,Symbol)
+    s=newSymbol(name,cls);
+
     *symbols->end++=s;
-    s->name=name;
-    s->cls=cls;
     s->depth=crtDepth;
+
     return s;
 }
 
@@ -47,6 +59,24 @@ Symbol *findSymbol(Symbols *symbols,const char *name){
     }
     return NULL;
 }
+
+Symbol *findSymbolInDomain(Symbols *symbols,const char *name){
+
+    int currDepth=crtDepth;
+    currDepth--;
+    int count=symbols->end-symbols->begin;
+    count--;
+
+    while(count>=0 && symbols->begin[count]->depth>currDepth){
+        if(strcmp(symbols->begin[count]->name,name)==0){
+            return symbols->begin[count];
+        }
+        count--;
+    }
+
+    return NULL;
+}
+
 
 void pushDomain(){
     crtDepth++;

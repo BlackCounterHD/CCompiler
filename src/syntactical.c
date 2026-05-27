@@ -1,9 +1,13 @@
 #include <stdio.h>
+#include "../header/semantic_domain_w_vector.h"
 #include "../header/syntactical.h"
 #include "../header/lexer.h"
 
 Token *ConsumedTk;
 Token *crtTk=NULL;
+
+Symbols symbols;
+Symbol *owner=NULL;
 
 int consume(int code){
     if(crtTk->code==code){
@@ -40,14 +44,27 @@ int structDef(){
 
     Token *startTk=crtTk;
     if(consume(STRUCT)){
+        Token *tkName=crtTk;
         if(consume(ID)){
             if(consume(LACC)){
+                Symbol *s=findSymbolInDomain(&symbols,tkName->text);
+                if(s){
+                    tkerr(crtTk,"Semantic error : symbol redefinition: %s",tkName->text);
+                }
+                s=addSymbolToDomain(&symbols,tkName->text,CLS_STRUCT);
+                s->type.typeBase=TB_STRUCT;
+                s->type.s=s;
+                s->type.nElements=-1;
+                pushDomain();
+                owner=s;
                 while(1){
                     if(varDef()){}
                     else break;
                 }
                 if(consume(RACC)){
                     if(consume(SEMICOLON)){
+                        owner=NULL;
+                        dropDomain(&symbols);
                         return 1;
                     }
                     else{
@@ -76,10 +93,26 @@ int structDef(){
 int varDef(){
 
     Token *startTk=crtTk;
-    if(typeBase()){
+    Type t;
+    if(typeBase(&t)){
+        Token *tkName=crtTk;
         if(consume(ID)){
-            arrayDecl();
+            arrayDecl(&t);
+            if(t.nElements==0)tkerr(crtTk,"Semantic error : a vector variable must have a specified dimension");
             if(consume(SEMICOLON)){
+                Symbol *var=findSymbolInDomain(&symbols,tkName->text);
+                if(var){
+                    tkerr(crtTk,"Semantic error : symbol redefinition: %s",tkName->text);
+                }
+                var=addSymbolToDomain(&symbols,tkName->text,CLS_VAR);
+                var->type=t;
+                var->owner=owner;
+                if(owner){
+                    switch(owner->cls){
+                        case CLS_FUNC:
+                            
+                    }
+                }
                 return 1;
             }
             else {
@@ -96,13 +129,20 @@ int varDef(){
     
 }
 
-int typeBase(){
-    if(consume(INT)){return 1;}
-    else if(consume(DOUBLE)){return 1;}
-    else if(consume(CHAR)){return 1;}
-    else if(consume(FLOAT)){return 1;} //becasue i added float token in lexical analyzer
+int typeBase(Type *t){
+    t->nElements=-1;
+    if(consume(INT)){t->typeBase=TB_INT; return 1;}
+    else if(consume(DOUBLE)){t->typeBase=TB_DOUBLE; return 1;}
+    else if(consume(CHAR)){t->typeBase=TB_CHAR; return 1;}
+    else if(consume(FLOAT)){t->typeBase=TB_FLOAT; return 1;} //becasue i added float token in lexical analyzer
     else if(consume(STRUCT)){
+        Token *tkName=crtTk;
         if(consume(ID)){
+            t->typeBase=TB_STRUCT;
+            t->s=findSymbol(&symbols,tkName->text);
+            if(!t->s){
+                tkerr(crtTk,"Semantic error : undefined structure: %s",tkName->text);
+            }
             return 1;
         }
         else{
@@ -113,10 +153,16 @@ int typeBase(){
     return 0;
 }
 
-int arrayDecl(){
+int arrayDecl(Type *t){
     
     if(consume(LBRACKET)){
-        consume(CT_INT);
+        Token *tkSize=crtTk;
+        if(consume(CT_INT)){
+            t->nElements=tkSize->i;
+        }
+        else{
+            t->nElements=0;
+        }
         if(consume(RBRACKET)){
             return 1;
         }
@@ -129,8 +175,8 @@ int arrayDecl(){
 }
 
 int fnDef(){
-    
-    if(typeBase() || consume(VOID)){
+    Type t;
+    if(typeBase(&t) || consume(VOID)){
         if(consume(ID)){
             if(consume(LPAR)){
                 if(fnParam()){
@@ -171,9 +217,10 @@ int fnDef(){
 }
 
 int fnParam() {
-    if(typeBase()){
+    Type t;
+    if(typeBase(&t)){
         if(consume(ID)){
-            arrayDecl();
+            arrayDecl(&t);
             return 1;
         }
         else{
@@ -501,8 +548,9 @@ int exprCast(){
 
     Token *startTk=crtTk;
     if(consume(LPAR)){
-        if(typeBase()){
-            arrayDecl();
+        Type t;
+        if(typeBase(&t)){
+            arrayDecl(&t);
             if(consume(RPAR)){
                 if(exprCast()){
                     return 1;
