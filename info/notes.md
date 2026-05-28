@@ -116,6 +116,14 @@ I added tkerr in the states where is no coming back if i introduce a bad token f
 5. **inout and out** . If is **out** it means it s modified in that function , if **inout** it means it comes with something and also is modified in that function
 
 6. **varIdx and paramIdx** represent the memory location of the variable or func parameter in the memory to be later used at code generation (for a virtual machine or assembly code) . our compiler will only need the memory locations not the names.
+
+7. 
+   1. Function parameter (SK_PARAM ): Will be initialized with cls = CLS_VAR and mem = MEM_ARG. 
+   2. Local variable (SK_VAR inside a function ): Will be initialized with cls = CLS_VAR and mem = MEM_LOCAL. 
+   3. Global variable (SK_VAR outside functions ): Will be initialized with cls = CLS_VAR and mem = MEM_GLOBAL
+
+8. the variable **newDomain** is used for marking a new domain for if s while s for s etc..
+
 ## Pointers
 
 1. From :

@@ -21,6 +21,12 @@ typedef struct{
 enum{CLS_VAR,CLS_FUNC,CLS_EXTFUNC,CLS_STRUCT};
 enum{MEM_GLOBAL,MEM_ARG,MEM_LOCAL};
 
+typedef struct _Symbols{
+    Symbol **begin; // the beginning of the symbols, or NULL
+    Symbol **end; // the position after the last symbol
+    Symbol **after; // the position after the allocated space
+}Symbols;
+
 typedef struct _Symbol{
 
     const char *name; // a reference to the name stored in a token
@@ -43,15 +49,10 @@ typedef struct _Symbol{
 
 }Symbol;
 
-typedef struct{
-    Symbol **begin; // the beginning of the symbols, or NULL
-    Symbol **end; // the position after the last symbol
-    Symbol **after; // the position after the allocated space
-}Symbols;
-
 extern int crtDepth;
 extern Symbols symbols;
 extern Symbol *owner;
+extern int globalMemoryOffset;
 
 void initSymbols(Symbols *symbols);
 void pushDomain();
@@ -61,9 +62,9 @@ Symbol *addSymbolToDomain(Symbols *symbols,const char *name,int cls);
 Symbol *findSymbol(Symbols *symbols,const char *name);
 Symbol *findSymbolInDomain(Symbols *symbols,const char *name);
 int symbolsLen(Symbols args);
-void addSymbolToList(Symbols *argsOrmembers);
-Symbol *dupSymbol(Symbol s);
-int typeSize(Type type);
-void allocInGlobalMemory(int size)
+void addSymbolToList(Symbols *argsOrmembers,Symbol *d);
+Symbol *dupSymbol(Symbol *d);
+int typeSize(Type *type);
+int allocInGlobalMemory(int size);
 
 #endif 

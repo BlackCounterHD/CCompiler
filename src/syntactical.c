@@ -6,9 +6,6 @@
 Token *ConsumedTk;
 Token *crtTk=NULL;
 
-Symbols symbols;
-Symbol *owner=NULL;
-
 int consume(int code){
     if(crtTk->code==code){
         ConsumedTk=crtTk;
@@ -110,9 +107,21 @@ int varDef(){
                 if(owner){
                     switch(owner->cls){
                         case CLS_FUNC:
-                            
+                            var->varIdx=symbolsLen(owner->args);
+                            var->mem = MEM_LOCAL;
+                            addSymbolToList(&owner->args,dupSymbol(var));
+                            break;
+                        case CLS_STRUCT:
+                            var->varIdx=typeSize(&owner->type);
+                            addSymbolToList(&owner->members,dupSymbol(var));
+                            break;
                     }
                 }
+                else{
+                    var->varIdx=allocInGlobalMemory(typeSize(&t));
+                    var->mem = MEM_GLOBAL;
+                }
+                
                 return 1;
             }
             else {
@@ -125,6 +134,7 @@ int varDef(){
             tkerr(crtTk,"Syntax error : missing declaration");
         }
     }
+
     return 0;
     
 }
@@ -176,9 +186,22 @@ int arrayDecl(Type *t){
 
 int fnDef(){
     Type t;
-    if(typeBase(&t) || consume(VOID)){
+    int hasType = typeBase(&t);
+    
+    if(!hasType && consume(VOID)){
+        t.typeBase = TB_VOID;
+        hasType = 1; 
+    }
+    if(hasType){
+        Token *tkName=crtTk;
         if(consume(ID)){
             if(consume(LPAR)){
+                Symbol *fn=findSymbolInDomain(&symbols,tkName->text);
+                if(fn)tkerr(crtTk,"symbol redefinition: %s",tkName->text);
+                fn=addSymbolToDomain(&symbols,tkName->text,CLS_FUNC);
+                fn->type=t;
+                owner=fn;
+                pushDomain();
                 if(fnParam()){
                     while(1){
                         if(consume(COMMA)){
@@ -193,7 +216,9 @@ int fnDef(){
                     }
                 }
                 if(consume(RPAR)){
-                    if(stmcompound()){
+                    if(stmcompound(0)){ //0 because the domain was already opened above when declaring the function parameters and now when declaring variables or anything else we are in same domain
+                        dropDomain(&symbols);
+                        owner=NULL;
                         return 1;
                     }
                     else {
@@ -219,8 +244,19 @@ int fnDef(){
 int fnParam() {
     Type t;
     if(typeBase(&t)){
+        Token *tkName=crtTk;
         if(consume(ID)){
-            arrayDecl(&t);
+            if(arrayDecl(&t)){
+                t.nElements=0;
+            }
+            Symbol *param=findSymbolInDomain(&symbols,tkName->text);
+            if(param)tkerr(crtTk,"symbol redefinition: %s",tkName->text);
+            param=addSymbolToDomain(&symbols,tkName->text,CLS_VAR);
+            param->type=t;
+            param->mem = MEM_ARG;
+            param->paramIdx=symbolsLen(owner->args);
+            // the parameter is added to both the current domain and the fn parameters
+            addSymbolToList(&owner->args,dupSymbol(param));
             return 1;
         }
         else{
@@ -232,7 +268,7 @@ int fnParam() {
 
 int stm(){
 
-    if(stmcompound()){
+    if(stmcompound(1)){
         return 1;
     }
 
@@ -354,14 +390,16 @@ int stm(){
     return 0;
 }
 
-int stmcompound() {
+int stmcompound(int newDomain) {
 
     if(consume(LACC)){
+        if(newDomain) pushDomain();
         while(1){
             if(varDef() || stm()){}
             else break;
         }
         if(consume(RACC)){
+            if(newDomain) dropDomain(&symbols);
             return 1;
         }
         else{

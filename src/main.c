@@ -4,6 +4,7 @@
 #include "../header/lexer.h"
 #include "../header/utils.h"
 #include "../header/syntactical.h"
+#include "../header/semantic_domain_w_vector.h"
 
 int main(int argc,char **argv){
 
@@ -28,7 +29,13 @@ int main(int argc,char **argv){
 
     showTokensInFile();
 
-    unit();
+    initSymbols(&symbols);
+
+    if(unit()){
+        printf("\n Program runs !\n");
+    }
+    
+    dropDomain(&symbols);
 
     freeTokenList();
 

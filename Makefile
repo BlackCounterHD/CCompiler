@@ -9,7 +9,7 @@ DEPFLAGS=-MP -MD
 
 CFLAGS=-Wall -Wextra -g 
 
-CFILES = src/main.c src/lexer.c src/utils.c src/syntactical.c
+CFILES = src/main.c src/lexer.c src/utils.c src/syntactical.c src/semantic_domain_w_vector.c
 
 #patsub - pattern substitution it helps naming the .o and .d files ( ex : main.c -> main.o ) 
 OBJECTS = $(patsubst src/%.c,bin/%.o,$(CFILES))

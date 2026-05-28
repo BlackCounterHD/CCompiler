@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "../header/semantic_domain_w_vector.h"
 #include "../header/utils.h"
 
 int crtDepth=0;
+Symbols symbols;
+Symbol *owner=NULL;
+int globalMemoryOffset=0;
 
 void initSymbols(Symbols *symbols){
     symbols->begin=NULL;
@@ -16,6 +20,8 @@ Symbol *newSymbol(const char *name,int cls){
     Symbol *s;
 
     SAFEALLOC(s,Symbol)
+
+    initSymbols(&s->args); //the args and members, Symbols vector need to also be initialized to null when a new symbol is created
 
     s->name=name;
     s->cls=cls;
@@ -95,4 +101,68 @@ void dropDomain(Symbols *symbols){
         symbols->end--;
         count--;
     }
+}
+
+int symbolsLen(Symbols args){
+    return args.end-args.begin;
+}
+
+void addSymbolToList(Symbols *argsOrmembers,Symbol *d){
+
+    if(argsOrmembers->end==argsOrmembers->after){
+        int count=argsOrmembers->after-argsOrmembers->begin;
+        int n=count*2; // double the room
+
+        if(n==0)n=1; // needed for the initial case
+
+        argsOrmembers->begin=(Symbol**)realloc(argsOrmembers->begin, n*sizeof(Symbol*));
+
+        if(argsOrmembers->begin==NULL)err("not enough memory");
+
+        argsOrmembers->end=argsOrmembers->begin+count;
+        argsOrmembers->after=argsOrmembers->begin+n;
+    }
+
+    *argsOrmembers->end++=d;
+}
+
+Symbol *dupSymbol(Symbol *d){
+
+    Symbol *s;
+
+    SAFEALLOC(s,Symbol);
+
+    *s=*d;
+
+    return s;
+}
+
+int typeSize(Type *type){
+
+    int nr=type->nElements;
+    if(nr==-1){
+        nr=1;
+    }
+    if(type->typeBase==TB_INT){return sizeof(int)*nr;}
+    else if(type->typeBase==TB_CHAR){return sizeof(char)*nr;}
+    else if(type->typeBase==TB_DOUBLE){return sizeof(double)*nr;}
+    else if(type->typeBase==TB_FLOAT){return sizeof(float)*nr;}
+    else if(type->typeBase==TB_STRUCT){
+        int count=type->s->members.end-type->s->members.begin;
+        int size=0;
+        for(int i=0;i<count;i++){
+            size=size+typeSize(&type->s->members.begin[i]->type);
+        }
+        size=size*nr;
+        return size;
+    }
+    return 0;
+}
+
+int allocInGlobalMemory(int size){
+    int currentOffset = globalMemoryOffset;
+    
+    globalMemoryOffset += size;
+    
+    return currentOffset;
 }

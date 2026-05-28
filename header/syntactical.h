@@ -1,6 +1,8 @@
 #ifndef SYNTACTICAL_H
 #define SYNTACTICAL_H
 
+#include "../header/semantic_domain_w_vector.h"
+
 
 int consume(int code);
 int unit();
@@ -11,7 +13,7 @@ int arrayDecl(Type *t);
 int fnDef();
 int fnParam();
 int stm();
-int stmcompound();
+int stmcompound(int newDomain);
 int expr();
 int exprAssign();
 int exprOr();

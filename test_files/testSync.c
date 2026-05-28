@@ -13,7 +13,13 @@ int max(int a, int b) {
         return b;
     }
 }
+int min(int a,int b){
+    int x;
 
+  
+        int x;
+    
+}
 void main() {
     int i;
     int limit;
