@@ -26,7 +26,7 @@ typedef struct
     CtVal ctVal; //the constant value
 }RetVal; //used for exprAdd | exprCast | exprPrimary
 
-void cast(Type *dst,Type *src);
+int convTo(Type *dst,Type *src); //cast
 Type getArithType(Type *s1,Type *s2);
 Symbol *addExtFunc(const char *name,Type type);
 Symbol *addFuncArg(Symbol *func,const char *name,Type type);
