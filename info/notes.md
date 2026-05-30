@@ -19,6 +19,22 @@
 1. Functions like **memcmp** use const variables 
 2. A variable that is read only and can t be modified 
 
+## Include Guards in header files
+
+```c
+#ifndef LEXER_H
+#define LEXER_H
+
+#endif
+```
+Practicaly when you include a header file it just copy s what s in header file to main
+
+1. For example if in main i include "lexer.h" and "utils.h" and in utils.h i also include "lexer.h" it won t be a problem because :
+    1. Firstly it will enter lexer.h check **ifndef LEXER** this checks if LEXER_H was already defined . If not it defines it and copies it s content
+    2. Then, it enters utils.h finds **include lexer.h** enters checks **ifndef LEXER** and it was defined so it doesn t define it again . Then define UTILS_H copies everything from it and moves on
+
+This rules also apply to **include stdio.h ; stdlib.h ; etc...** 
+
 ## Functions
 
 1. Functions like **memcmp , fseek , ftell** very good documentation on **man**

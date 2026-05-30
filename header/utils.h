@@ -1,5 +1,5 @@
 #ifndef UTILS_H
-#define UTILS_h
+#define UTILS_H
 
 #include "../header/lexer.h" //for err function
 

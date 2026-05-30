@@ -2,7 +2,9 @@
 #define SYNTACTICAL_H
 
 #include "../header/semantic_domain_w_vector.h"
+#include "../header/lexer.h"
 
+extern Token *crtTk;
 
 int consume(int code);
 int unit();
