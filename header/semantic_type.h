@@ -3,13 +3,6 @@
 
 #include "../header/semantic_domain_w_vector.h"
 
-Type   createType(int typeBase,int nElements){   
-    Type  t;   
-    t.typeBase=typeBase;   
-    t.nElements=nElements;   
-    return t; 
-}
-
 typedef union 
 {
     long int i; //int,char
@@ -27,9 +20,10 @@ typedef struct
 }RetVal; //used for exprAdd | exprCast | exprPrimary
 
 int convTo(Type *dst,Type *src); //cast
-Type getArithType(Type *s1,Type *s2);
+int arithTypeTo(Type *s1,Type *s2,Type *rez); //getArithType
 Symbol *addExtFunc(const char *name,Type type);
 Symbol *addFuncArg(Symbol *func,const char *name,Type type);
+Type createType(int typeBase,int nElements);
 
 
 #endif

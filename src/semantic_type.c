@@ -69,3 +69,36 @@ this 2 functions above are used for predifined functions like put_s , get_s etc.
 s=addExtFunc("put_s",createType(TB_VOID,-1));
 addFuncArg(s,"s",createType(TB_CHAR,0));
 */
+
+Type createType(int typeBase,int nElements){   
+    Type  t;   
+    t.typeBase=typeBase;   
+    t.nElements=nElements;   
+    return t; 
+}
+
+int arithTypeTo(Type *s1,Type *s2,Type *rez){
+
+    if(s1->nElements>=0 || s2->nElements>=0){
+        return 0;
+    }
+
+    if(s1->typeBase==TB_STRUCT || s2->typeBase==TB_STRUCT){
+        return 0;
+    }
+    
+    if(s1->typeBase==TB_VOID || s2->typeBase==TB_VOID){
+        return 0;
+    }
+
+    if(s1->typeBase==TB_DOUBLE || s2->typeBase==TB_DOUBLE){
+        rez->typeBase=TB_DOUBLE;
+    }
+    else if(s1->typeBase==TB_FLOAT || s2->typeBase==TB_FLOAT){
+        rez->typeBase=TB_FLOAT;
+    }
+    else {
+        rez->typeBase=TB_INT;
+    }
+    return 1;
+}
