@@ -35,7 +35,10 @@ typedef struct _Symbol{
     Type type;
     int depth; // 0-global, 1-in function, 2... - nested blocks in function
     union{
-        Symbols args; // used only of functions
+        struct {
+            Symbols params; // for function arguments
+            Symbols locals; // for local variables
+        } fn;
         Symbols members; // used only for structs
     };
 
@@ -63,6 +66,7 @@ Symbol *findSymbol(Symbols *symbols,const char *name);
 Symbol *findSymbolInDomain(Symbols *symbols,const char *name);
 int symbolsLen(Symbols args);
 void addSymbolToList(Symbols *argsOrmembers,Symbol *d);
+Symbol *findSymbolInList(Symbols *argsOrmembers,const char *name);
 Symbol *dupSymbol(Symbol *d);
 int typeSize(Type *type);
 int allocInGlobalMemory(int size);

@@ -2,14 +2,14 @@
 
 CC = gcc
 
-TARGET = bin/syntact
+TARGET = bin/compi
 
 # generate files that encode make rules for the .h dependencies
 DEPFLAGS=-MP -MD
 
 CFLAGS=-Wall -Wextra -g 
 
-CFILES = src/main.c src/lexer.c src/utils.c src/syntactical.c src/semantic_domain_w_vector.c
+CFILES = src/main.c src/lexer.c src/utils.c src/syntactical.c src/semantic_domain_w_vector.c src/semantic_type.c
 
 #patsub - pattern substitution it helps naming the .o and .d files ( ex : main.c -> main.o ) 
 OBJECTS = $(patsubst src/%.c,bin/%.o,$(CFILES))

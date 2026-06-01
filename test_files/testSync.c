@@ -14,11 +14,7 @@ int max(int a, int b) {
     }
 }
 int min(int a,int b){
-    int x;
-
-  
-        int x;
-    
+    int x;    
 }
 void main() {
     int i;

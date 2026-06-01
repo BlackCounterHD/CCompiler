@@ -53,14 +53,19 @@ int convTo(Type *dst,Type *src){
 Symbol   *addExtFunc(const char *name,Type type) { 
 
     Symbol   *s=addSymbolToDomain(&symbols,name,CLS_EXTFUNC);   
-    s->type=type;   
-    initSymbols(&s->args);  
+    s->type=type;
+    /*   nu mai am nevoie de acestea ca se initializeaza cand apelez addSymbolToDomain
+    initSymbols(&s->fn.locals);
+    initSymbols(&s->fn.params);  
+    */
     return s; 
 }
 
 Symbol   *addFuncArg(Symbol *func,const char *name,Type type) {   
-    Symbol  *a=addSymbol(&func->args,name,CLS_VAR);
-    a->type=type;   
+    Symbol  *a=newSymbol(name,CLS_VAR);
+    a->type=type;
+    a->mem = MEM_ARG;
+    addSymbolToList(&func->fn.params, a);   
     return a;
 }
 
@@ -91,6 +96,9 @@ int arithTypeTo(Type *s1,Type *s2,Type *rez){
         return 0;
     }
 
+    rez->nElements = -1;
+    rez->s = NULL;
+
     if(s1->typeBase==TB_DOUBLE || s2->typeBase==TB_DOUBLE){
         rez->typeBase=TB_DOUBLE;
     }
@@ -101,4 +109,11 @@ int arithTypeTo(Type *s1,Type *s2,Type *rez){
         rez->typeBase=TB_INT;
     }
     return 1;
+}
+
+int canBeScalar(RetVal *r){
+    if(r->type.nElements<0 &&(r->type.typeBase==TB_INT || r->type.typeBase==TB_CHAR || r->type.typeBase==TB_FLOAT || r->type.typeBase==TB_DOUBLE)){
+        return 1;
+    }
+    return 0;
 }

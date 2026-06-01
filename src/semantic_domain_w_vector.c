@@ -21,8 +21,12 @@ Symbol *newSymbol(const char *name,int cls){
 
     SAFEALLOC(s,Symbol)
 
-    initSymbols(&s->args); //the args and members, Symbols vector need to also be initialized to null when a new symbol is created
-
+    if (cls == CLS_FUNC || cls == CLS_EXTFUNC) {
+        initSymbols(&s->fn.params);
+        initSymbols(&s->fn.locals);
+    } else if (cls == CLS_STRUCT) {
+        initSymbols(&s->members);
+    }
     s->name=name;
     s->cls=cls;
 
@@ -124,6 +128,16 @@ void addSymbolToList(Symbols *argsOrmembers,Symbol *d){
     }
 
     *argsOrmembers->end++=d;
+}
+
+Symbol *findSymbolInList(Symbols *argsOrmembers,const char *name){
+    int count=argsOrmembers->end-argsOrmembers->begin;
+    for(int i=count-1;i>=0;i--){
+        if(strcmp(argsOrmembers->begin[i]->name,name)==0){
+            return argsOrmembers->begin[i];
+        }
+    }
+    return NULL;
 }
 
 Symbol *dupSymbol(Symbol *d){
