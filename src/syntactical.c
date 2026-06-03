@@ -37,7 +37,8 @@ int unit(){
 
 }
 
-
+// the structure name must be unique in the domain 
+// inside the structure, there cannot be two variables with the same name 
 int structDef(){
 
     Token *startTk=crtTk;
@@ -88,6 +89,8 @@ int structDef(){
     
 }
 
+// the variable name must be unique in the domain 
+// array variables must have a specified dimension (not accepted: int v[]) 
 int varDef(){
 
     Token *startTk=crtTk;
@@ -141,6 +144,7 @@ int varDef(){
     
 }
 
+// if the base type is a structure, it must be already defined beforehand 
 int typeBase(Type *t){
     t->nElements=-1;
     if(consume(INT)){t->typeBase=TB_INT; return 1;}
@@ -186,6 +190,9 @@ int arrayDecl(Type *t){
     
 }
 
+// the function name must be unique in the domain 
+// the function's local domain starts immediately after LPAR 
+// the function body {...} does not define a new subdomain inside the function's local domain 
 int fnDef(){
     Type t;
     int hasType = typeBase(&t);
@@ -245,6 +252,9 @@ int fnDef(){
     
 }
 
+// the parameter name must be unique in the domain 
+// parameters can be arrays with a given dimension, but in this case their dimension is erased (int v[10] -> int v[]) 
+// the parameter is added to both the current domain and the function's parameters list 
 int fnParam() {
     Type t;
     if(typeBase(&t)){
@@ -270,6 +280,13 @@ int fnParam() {
     return 0; 
 }
 
+// the compound body {...} of the instructions defines a new domain 
+
+// the condition for 'if', 'while', or 'for' must evaluate to a scalar value
+// a void function cannot return a value
+// the returned expression must evaluate to a scalar value
+// the return value must be convertible to the function's return type
+// a non-void function must return a value
 int stm(){
 
     RetVal rInit; //ex : i=0;
@@ -410,6 +427,7 @@ int stm(){
     return 0;
 }
 
+// a new domain is defined only on request (newDomain)
 int stmcompound(int newDomain) {
 
     //here newDomain is helpfull when we declare a function we create a new domain add it s parameters 
@@ -439,6 +457,11 @@ int expr(RetVal *r){
     return 0;
 }
 
+// the assign destination (left side) must be a left-value (memory address)
+// the assign destination cannot be a constant (e.g., an array name)
+// both the destination and the source must be scalar values
+// the assign source must be convertible to the destination's type
+// the result of an assignment becomes a constant right-value
 int exprAssign(RetVal *r){
 
     Token *startTk=crtTk;
@@ -474,6 +497,9 @@ int exprAssign(RetVal *r){
 exprOr=exprAnd exprOrAux
 exprOrAux=OR exprAnd exprOrAux | epsilon
 */
+
+// both operands must be scalar values compatible with logical operations
+// the result of a logical operation is always a boolean (represented as TB_INT), r-value, constant
 int exprOr(RetVal *r){
     if(exprAnd(r)){
         if(exprOrAux(r)){
@@ -508,6 +534,8 @@ int exprOrAux(RetVal *r){
     return 1; //epsilon represents the empty string and lets the funtions to return true if it s nothing next
 }
 
+// both operands must be scalar values compatible with logical operations
+// the result of a logical operation is always a boolean (represented as TB_INT), r-value, constant
 int exprAnd(RetVal *r){
     if(exprEq(r)){
         if(exprAndAux(r)){
@@ -540,6 +568,8 @@ int exprAndAux(RetVal *r){
     return 1; 
 }
 
+// both operands must be compatible scalar types
+// the result of a comparison is always a boolean (represented as TB_INT), r-value, constant
 int exprEq(RetVal *r){
     if(exprRel(r)){
         if(exprEqAux(r)){
@@ -572,6 +602,8 @@ int exprEqAux(RetVal *r){
     return 1;
 }
 
+// both operands must be compatible scalar types
+// the result of a comparison is always a boolean (represented as TB_INT), r-value, constant
 int exprRel(RetVal *r){
     if(exprAdd(r)){
         if(exprRelAux(r)){
@@ -607,6 +639,9 @@ int exprRelAux(RetVal *r){
     return 1;
 }
 
+// both operands must be scalar types
+// the result type is calculated by promoting the operands (arithTypeTo)
+// the result becomes a right-value and a constant
 int exprAdd(RetVal *r){
     if(exprMul(r)){
         if(exprAddAux(r)){
@@ -639,6 +674,9 @@ int exprAddAux(RetVal *r){
     return 1;
 }
 
+// both operands must be scalar types
+// the result type is calculated by promoting the operands (arithTypeTo)
+// the result becomes a right-value and a constant
 int exprMul(RetVal *r){
     if(exprCast(r)){
         if(exprMulAux(r)){
@@ -669,6 +707,10 @@ int exprMulAux(RetVal *r){
     return 1;
 }
 
+// cannot cast to a struct type
+// cannot cast a struct variable to another type
+// an array can only be cast to another array
+// a scalar can only be cast to another scalar
 int exprCast(RetVal *r){
 
     Token *startTk=crtTk;
@@ -704,6 +746,8 @@ int exprCast(RetVal *r){
     return 0;
 }
 
+// the unary operator requires a scalar operand
+// the result becomes a right-value and a constant
 int exprUnary(RetVal *r){
     if(consume(SUB) || consume(NOT)){
         if(exprUnary(r)){
@@ -727,7 +771,23 @@ int exprUnary(RetVal *r){
     | exprPostfix DOT ID
     | exprPrimary
     A=Aalpha1|Aalpha2|beta1
+
+    * A = beta A'
+    * A' = alpha1 A' | alpha2 A' | epsilon
+    
+    exprPostfix = exprPrimary exprPostfixAux
+    exprPostfixAux = LBRACKET expr RBRACKET exprPostfixAux 
+    | DOT ID exprPostfixAux 
+    | epsilon
 */
+
+// only an array can be indexed
+// the index expression must be convertible to an integer
+// the result of indexing an array is a scalar left-value (not constant)
+
+// a field can only be selected from a struct variable
+// the specified field must exist in the structure's definition
+// the result is a left-value. It is constant only if the field is an array.
 int exprPostfix(RetVal *r){
     if(exprPrimary(r)){
         if(exprPostfixAux(r)){
@@ -783,6 +843,12 @@ int exprPostfixAux(RetVal *r){
     return 1;
 }
 
+// the identifier must be defined in the symbol table
+// the identifier must represent a function (or external function) to be called
+// the number of given arguments must not exceed the number of parameters
+// the argument type must be convertible to the corresponding parameter type
+// too few arguments: all parameters must be provided with arguments
+// the result of a function call is a right-value, constant, with the function's return type
 int exprPrimary(RetVal *r){
     Token *tkName=crtTk;
     if(consume(ID)){
@@ -823,6 +889,8 @@ int exprPrimary(RetVal *r){
                 tkerr(crtTk,"Syntax error : missing )");
             }
         }
+        // a function identifier cannot be used as a regular variable without being called
+        // the result is a left-value. It is constant only if the variable is an array.
         else {
            
             if(s->cls == CLS_FUNC || s->cls == CLS_EXTFUNC) tkerr(crtTk, "a function can only be called");

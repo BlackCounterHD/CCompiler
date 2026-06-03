@@ -25,6 +25,7 @@ Symbol *addExtFunc(const char *name,Type type);
 Symbol *addFuncArg(Symbol *func,const char *name,Type type);
 Type createType(int typeBase,int nElements);
 int canBeScalar(RetVal *r);
+void addExtFuncs();
 
 
 #endif

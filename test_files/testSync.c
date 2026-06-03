@@ -23,6 +23,7 @@ void main() {
     struct Point p;
     double result;
 
+    put_i(i);
     limit = 5;
     i = 0;
     pi = 3.14;

@@ -31,6 +31,11 @@ int main(int argc,char **argv){
 
     initSymbols(&symbols);
 
+    //this needs to be run before the semantic 
+    //analyzer for it to know this predifined functions
+    //when we use them
+    addExtFuncs();
+
     if(unit()){
         printf("\n Program runs !\n");
     }

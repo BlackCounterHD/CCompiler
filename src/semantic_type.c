@@ -54,7 +54,7 @@ Symbol   *addExtFunc(const char *name,Type type) {
 
     Symbol   *s=addSymbolToDomain(&symbols,name,CLS_EXTFUNC);   
     s->type=type;
-    /*   nu mai am nevoie de acestea ca se initializeaza cand apelez addSymbolToDomain
+    /*   i don t need those anymore because they are already initialized inside addSymbolToDomain
     initSymbols(&s->fn.locals);
     initSymbols(&s->fn.params);  
     */
@@ -116,4 +116,32 @@ int canBeScalar(RetVal *r){
         return 1;
     }
     return 0;
+}
+
+
+void addExtFuncs() {
+    Symbol *s;
+
+    s = addExtFunc("put_s", createType(TB_VOID, -1));
+    addFuncArg(s, "s", createType(TB_CHAR, 0));
+
+    s = addExtFunc("get_s", createType(TB_VOID, -1));
+    addFuncArg(s, "s", createType(TB_CHAR, 0));
+
+    s = addExtFunc("put_i", createType(TB_VOID, -1));
+    addFuncArg(s, "i", createType(TB_INT, -1));
+
+    s = addExtFunc("get_i", createType(TB_INT, -1));
+
+    s = addExtFunc("put_d", createType(TB_VOID, -1));
+    addFuncArg(s, "d", createType(TB_DOUBLE, -1));
+
+    s = addExtFunc("get_d", createType(TB_DOUBLE, -1));
+
+    s = addExtFunc("put_c", createType(TB_VOID, -1));
+    addFuncArg(s, "c", createType(TB_CHAR, -1));
+
+    s = addExtFunc("get_c", createType(TB_CHAR, -1));
+
+    s = addExtFunc("seconds", createType(TB_DOUBLE, -1));
 }
